@@ -1,30 +1,42 @@
 
-
 # Pull base image  
-FROM centos:latest
-  
+FROM node:4
+
+RUN npm install -g npm@3
+RUN npm install -g cnpm
+RUN npm install -g cnpm
+
 MAINTAINER crabdave "calorie.david@gmail.com"  
 
 # Usage: USER [UID]
 USER root
 
 # modify timezone
-RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Set the locale
+RUN apt-get clean && apt-get update
+RUN apt-get install locales
+RUN locale-gen en_US.UTF-8
 
 #modify Character set
-
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
-
-RUN yum install -y git
+# Ensure UTF-8 locale
+#COPY locale /etc/default/locale
+RUN locale-gen zh_CN.UTF-8 &&\
+  DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
+RUN locale-gen zh_CN.UTF-8  
+ENV LANG zh_CN.UTF-8  
+ENV LANGUAGE zh_CN:zh  
+ENV LC_ALL zh_CN.UTF-8  
 
 #add jdk
 ADD jdk-8u91-linux-x64.tar.gz /opt
 #add maven
 ADD apache-maven-3.3.3-bin.tar.gz /opt
 #add maven conf
-#ADD settings.xml /opt/apache-maven-3.3.3/conf
+ADD settings.xml /opt/apache-maven-3.3.3/conf
+
 #add jenkins
 ADD jenkins.war /opt
 
@@ -34,8 +46,8 @@ ENV CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 ENV MAVEN_HOME=/opt/apache-maven-3.3.3
 ENV PATH=$MAVEN_HOME/bin:$PATH
 
-#add start script
 ADD start.sh /opt
 RUN chmod +x /opt/start.sh
 
 ENTRYPOINT ["/opt/start.sh"]
+
