@@ -2,19 +2,13 @@
 
 download jenkins from https://jenkins.io/
 
+cker-compose up -d
 
-docker build -t jenkins .
+docker logs --tail 100 -f jenkins_jenkins_1
 
+docker exec -it jenkins_jenkins_1 /bin/bash
 
-docker run -d -e "container=container-jenkins" --name container-jenkins -h container-jenkins -p 7000:8080 -p 50000:50000 jenkins
+docker build -t myjenkins .
 
-
-docker logs --tail 100 -f container-jenkins
-
-docker stop container-jenkins
-
-docker rm container-jenkins
-
-docker exec -it container-jenkins /bin/bash
 
 

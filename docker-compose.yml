@@ -1,0 +1,11 @@
+
+jenkins:
+  image: myjenkins:latest
+  privileged: true
+  restart: always 
+  ports:
+    - "50001:50000"
+    - "8012:8080"
+  volumes:
+    - ./jenkins_home:/root/.jenkins
+    - ./data:/data
